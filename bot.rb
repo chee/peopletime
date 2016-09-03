@@ -24,7 +24,7 @@ end
 
 def set_person_time(person, place)
   db = SQLite3::Database.new "people.db"
-  db.execute "insert into people values ( '#{person}', #{place} );"
+  db.execute "insert into people values ( '#{person}', '#{place}' );"
 end
 
 def get_person_time(person)
