@@ -45,7 +45,7 @@ def get_people()
   result = db.execute 'select person from people;'
   string = ''
   result.each do |person|
-    string += "#{person} "
+    string += "#{person[0]} "
   end
   string
 end
