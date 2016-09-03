@@ -72,7 +72,7 @@ bot.get_updates(fail_silently: true) do |message|
     when /time\s+in\s+(\w+)/i
       person = $1
       time = get_person_time(person)
-      reply.text = "it's #{time} in #{person}"
+      reply.text = "it's #{time} where #{person} is"
     when /delete\s+(\w+)/i
       person = $1
       delete_person(person)
