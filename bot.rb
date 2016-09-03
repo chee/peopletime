@@ -32,7 +32,7 @@ def get_person_time(person)
   result = db.execute("select place from people where person = '#{person}';")
   if result[0]
     timezone = Timezone[result[0][0]]
-    time = timezone(Time.now)
+    time = timezone.time(Time.now)
     "#{time.hour}:#{time.min}"
   else
     "unknown"
