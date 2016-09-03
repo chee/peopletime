@@ -1,5 +1,11 @@
 require 'telegram_bot'
 require 'sqlite3'
+require 'geokit'
+require 'timezone'
+
+Timezone::Lookup.config(:geonames) do |config|
+  config.username = 'peopletime'
+end
 
 db = SQLite3::Database.new "people.db"
 
@@ -25,10 +31,8 @@ def get_person_time(person)
   db = SQLite3::Database.new "people.db"
   result = db.execute("select place from people where person = '#{person}';")
   if result[0]
-    zone = result[0][0]
-    time = Time.new
-    time = time.getutc
-    time += (60 * 60 * zone)
+    timezone = Timezone[result[0][0]]
+    time = timezone(Time.now)
     "#{time.hour}:#{time.min}"
   else
     "unknown"
@@ -61,8 +65,10 @@ bot.get_updates(fail_silently: true) do |message|
     when /(\w+)\s+is\s+in\s+(.*+)/i
       person = $1
       place = $2
-      set_person_time(person, place)
-      reply.text = "set #{person} to #{place}!"
+      geocode = Geokit::Geocoders::GoogleGeocoder.geocode(place)
+      timezone = Timezone.lookup(geocode.lat, geocode.lng)
+      set_person_time(person, timezone.name)
+      reply.text = "set #{person} to #{geocode.full_address} (#{timezone.name})!"
     when /time\s+in\s+(\w+)/i
       person = $1
       time = get_person_time(person)
@@ -77,6 +83,6 @@ bot.get_updates(fail_silently: true) do |message|
       reply.text = "#{message.from.first_name}, i have no idea what #{command.inspect} means."
     end
     puts "sending #{reply.text.inspect} to @#{message.from.username}"
-    reply.send_with(bot)
+    reply.send_with(bot) if command
   end
 end
