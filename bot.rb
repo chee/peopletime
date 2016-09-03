@@ -40,6 +40,16 @@ def delete_person(person)
   db.execute "delete from people where person = '#{person}';"
 end
 
+def get_people()
+  db = SQLite3::Database.new "people.db"
+  result = db.execute 'select person from people;'
+  string = ''
+  result.each do |person|
+    string += "#{person} "
+  end
+  string
+end
+
 bot = TelegramBot.new(token: '269576788:AAFYdxw9M7YW7e1G-bh5ZRFpPvXBSpJnk2w')
 
 bot.get_updates(fail_silently: true) do |message|
@@ -61,6 +71,8 @@ bot.get_updates(fail_silently: true) do |message|
       person = $1
       delete_person(person)
       reply.text = "#{person} has been deleted"
+    when /^list$/i
+      reply.text = get_people
     else
       reply.text = "#{message.from.first_name}, i have no idea what #{command.inspect} means."
     end
