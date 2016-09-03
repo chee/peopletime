@@ -42,10 +42,10 @@ end
 
 def get_people()
   db = SQLite3::Database.new "people.db"
-  result = db.execute 'select person from people;'
+  result = db.execute 'select * from people;'
   string = ''
   result.each do |person|
-    string += "#{person[0]} "
+    string += "#{person[0]}: #{person[1]}\n"
   end
   string
 end
